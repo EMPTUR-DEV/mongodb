@@ -1,6 +1,7 @@
 const config = require('../config/config');
 const express = require('express');
 
+const utiles = require('../utiles/utiles');
 
 const bcrypt = require('bcrypt');
 
@@ -8,6 +9,8 @@ const _ = require('underscore');
 
 const app = express();
 const Usuario = require('../modelos/usuario');
+
+const { verificaToken, verificaAdminRol } = require('../middleware/autenticacion');
 
 
 esquemaUsuario = (body) => {
@@ -22,7 +25,7 @@ encriptarPass = (pass) => {
     return bcrypt.hashSync(pass, loopEncPass);
 }
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
 
     let desde = Number(req.query.desde) || 0;
     let limite = Number(req.query.limite) || 5;
@@ -39,14 +42,11 @@ app.get('/usuario', function(req, res) {
         .limit(limite)
         .exec((err, usuarios) => {
 
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
+            if (err) return utiles.respuesta(500, err, res);
 
-            Usuario.count(condicionesGET, (err, cantidad) => {
+            Usuario.estimatedDocumentCount(condicionesGET, (err, cantidad) => {
+
+                if (err) return utiles.respuesta(400, err, res);
 
                 res.json({
                     ok: true,
@@ -57,7 +57,7 @@ app.get('/usuario', function(req, res) {
         });
 });
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdminRol], function(req, res) {
 
     let body = req.body;
 
@@ -65,12 +65,7 @@ app.post('/usuario', function(req, res) {
 
     usuario.save((err, usuarioDB) => {
 
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
+        if (err) return utiles.respuesta(400, err, res);
 
         res.json({
             ok: true,
@@ -81,7 +76,7 @@ app.post('/usuario', function(req, res) {
 
 });
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', verificaToken, (req, res) => {
 
     // el segundo id es el del parametro
     let id = req.params.id;
@@ -93,12 +88,8 @@ app.put('/usuario/:id', function(req, res) {
 
     Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioDB) => {
 
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            })
-        }
+        if (err) return utiles.respuesta(400, err, res);
+
 
         res.json({
             ok: true,
@@ -109,26 +100,15 @@ app.put('/usuario/:id', function(req, res) {
     });
 });
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
 
     Usuario.findByIdAndUpdate(id, { estado: false }, { new: false }, (err, usuarioBorrado) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        };
+        if (err) return utiles.respuesta(400, err, res);
 
-        if (!usuarioBorrado || !usuarioBorrado.estado) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'Usuario ya eliminado'
-                }
-            })
-        }
+        if (!usuarioBorrado || !usuarioBorrado.estado) return utiles.respuesta(400, { err: { message: 'Usuario ya eliminado' } }, res);
+
 
         res.json({
             ok: true,
