@@ -104,7 +104,8 @@ app.delete('/usuario/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
 
-    Usuario.findByIdAndUpdate(id, { estado: false }, { new: false }, (err, usuarioBorrado) => {
+    Usuario.findByIdAndUpdate(id, { estado: false }, { new: false },
+         (err, usuarioBorrado) => {
         if (err) return utiles.respuesta(400, err, res);
 
         if (!usuarioBorrado || !usuarioBorrado.estado) return utiles.respuesta(400, { err: { message: 'Usuario ya eliminado' } }, res);
