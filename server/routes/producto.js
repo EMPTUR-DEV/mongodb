@@ -10,7 +10,7 @@ const utiles = require('../utiles/utiles');
 
 const _ = require('underscore');
 
-let Producto = require('../modelos/producto');
+let Producto = require('../models/producto');
 
 let { verificaToken, verificaAdminRol } = require('../middleware/autenticacion');
 

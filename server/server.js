@@ -18,8 +18,8 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 
 console.log(path.resolve(__dirname, '../public'));
 
-// Configuración local de rutas
-app.use(require('./rutas/index'));
+// Configuración local de routes
+app.use(require('./routes/index'));
 
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },

@@ -12,7 +12,7 @@ const _ = require('underscore');
 
 let app = express();
 
-let Categoria = require('../modelos/categoria');
+let Categoria = require('../models/categoria');
 
 // ===========================
 //  Mostrar todas las categorias
@@ -30,7 +30,7 @@ esquemaCategoria = (body) => {
 }
 
 app.get('/categoria', verificaToken, (req, res) => {
-    
+
     Categoria.find({})
         .sort('descripcion')
         .populate('idUsuario', 'nombre email', 'Usuario')

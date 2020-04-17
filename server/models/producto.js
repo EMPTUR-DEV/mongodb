@@ -25,6 +25,11 @@ var productoSchema = new Schema({
     usuario: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario'
+    },
+    img: {
+        type: String,
+        required: false,
+        default: 'Imagen'
     }
 });
 

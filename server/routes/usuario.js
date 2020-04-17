@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
 const app = express();
-const Usuario = require('../modelos/usuario');
+const Usuario = require('../models/usuario');
 
 const { verificaToken, verificaAdminRol } = require('../middleware/autenticacion');
 
@@ -105,19 +105,19 @@ app.delete('/usuario/:id', verificaToken, (req, res) => {
     let id = req.params.id;
 
     Usuario.findByIdAndUpdate(id, { estado: false }, { new: false },
-         (err, usuarioBorrado) => {
-        if (err) return utiles.respuesta(400, err, res);
+        (err, usuarioBorrado) => {
+            if (err) return utiles.respuesta(400, err, res);
 
-        if (!usuarioBorrado || !usuarioBorrado.estado) return utiles.respuesta(400, { err: { message: 'Usuario ya eliminado' } }, res);
-
-
-        res.json({
-            ok: true,
-            usuario: usuarioBorrado
-        });
+            if (!usuarioBorrado || !usuarioBorrado.estado) return utiles.respuesta(400, { err: { message: 'Usuario ya eliminado' } }, res);
 
 
-    })
+            res.json({
+                ok: true,
+                usuario: usuarioBorrado
+            });
+
+
+        })
 
 
 

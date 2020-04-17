@@ -6,10 +6,7 @@ const utiles = require('../utiles/utiles');
 // Verificar token //
 // ================ //
 
-let verificaToken = (req, res, next) => {
-
-    let token = req.get('token');
-    // lo agarra del header
+let verificador = (req, res, next, token) => {
 
     jwt.verify(token, process.env.SEED_TOKEN, (err, decoded) => {
 
@@ -20,6 +17,16 @@ let verificaToken = (req, res, next) => {
         next()
 
     });
+
+}
+
+let verificaToken = (req, res, next) => {
+
+    let token = req.get('token');
+    // lo agarra del header
+
+    verificador(req, res, next, token);
+
 };
 
 // ================ //
@@ -35,11 +42,21 @@ let verificaAdminRol = (req, res, next) => {
     next();
 };
 
+// ================ //
+// Verificar token img//
+// ================ //
 
+let verificaTokenImg = (req, res, next) => {
 
+    let token = req.query.token;
+
+    verificador(req, res, next, token);
+
+}
 
 
 module.exports = {
     verificaToken,
-    verificaAdminRol
+    verificaAdminRol,
+    verificaTokenImg
 }
